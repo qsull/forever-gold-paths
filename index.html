@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forever Gold Paths</title>
+<meta name="description" content="Which WoW Forever crafts, gathering and drops make money and actually sell. TSM region and realm data, updated every 30 minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=Spectral:wght@400;500&display=swap">
+<style>
+/* Layout: sticky header with live update status; hero summary; filter sidebar beside results; tool sections below.
+   Palette: charcoal and parchment with WoW gold, arcane blue and item-quality colours. */
+:root {
+  --bg: #f1efe8; --bg2: #e9e6dc; --panel: #fbfaf5; --panel2: #f5f2e9; --line: #dcd7c8; --line2: #cbc5b3;
+  --fg: #2b2c24; --fg2: #57564b; --fg3: #807e70;
+  --gold: #9a6a00; --gold-soft: #f3e3b8; --blue: #2f6fb0; --ok: #2f7d32; --warn: #a86d00; --bad: #b33a2e;
+  --coin-g: #a87400; --coin-s: #7d7f86; --coin-c: #a0582a;
+  --q-common: #2b2c24; --q-uncommon: #1d8a12; --q-rare: #0a62c2; --q-epic: #8a2bd6;
+  --p1: #b8860b; --p2: #2f6fb0; --p3: #3d8b5a; --p4: #7a55b5; --p5: #c0573a; --p6: #2a8c8c;
+  --grid: #e6e1d3; --axis: #c9c3b2; --shadow: 0 1px 2px rgba(43,44,36,.06), 0 8px 24px rgba(43,44,36,.07);
+  --display: "Cinzel", "Trajan Pro", Georgia, serif; --ui: "Source Sans 3", "Segoe UI", system-ui, sans-serif; --num: "Spectral", Georgia, serif;
+  --r: 10px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #2b2c24; --bg2: #26271f; --panel: #33342b; --panel2: #3a3b31; --line: #46473b; --line2: #57584a;
+  --fg: #ede8d7; --fg2: #c4bfab; --fg3: #9a9684;
+  --gold: #e8bb4f; --gold-soft: #4a4126; --blue: #74ade3; --ok: #82c784; --warn: #e6b34c; --bad: #ec8573;
+  --coin-g: #f0c450; --coin-s: #c9ccd3; --coin-c: #d9925c;
+  --q-common: #ede8d7; --q-uncommon: #4fd63e; --q-rare: #4aa3ff; --q-epic: #c57cff;
+  --p1: #e3b448; --p2: #6fa8dc; --p3: #79c08f; --p4: #b39ae6; --p5: #e88a6a; --p6: #5fc4c4;
+  --grid: #3c3d33; --axis: #57584a; --shadow: 0 1px 2px rgba(18,18,12,.3), 0 10px 30px rgba(18,18,12,.28); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #2b2c24; --bg2: #26271f; --panel: #33342b; --panel2: #3a3b31; --line: #46473b; --line2: #57584a;
+  --fg: #ede8d7; --fg2: #c4bfab; --fg3: #9a9684;
+  --gold: #e8bb4f; --gold-soft: #4a4126; --blue: #74ade3; --ok: #82c784; --warn: #e6b34c; --bad: #ec8573;
+  --coin-g: #f0c450; --coin-s: #c9ccd3; --coin-c: #d9925c;
+  --q-common: #ede8d7; --q-uncommon: #4fd63e; --q-rare: #4aa3ff; --q-epic: #c57cff;
+  --p1: #e3b448; --p2: #6fa8dc; --p3: #79c08f; --p4: #b39ae6; --p5: #e88a6a; --p6: #5fc4c4;
+  --grid: #3c3d33; --axis: #57584a; --shadow: 0 1px 2px rgba(18,18,12,.3), 0 10px 30px rgba(18,18,12,.28); color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.gutter { padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1240px; margin: 0 auto; }
+
+/* header */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg2); }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg2) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.top .inner { display: flex; align-items: center; gap: 18px; min-height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: none; }
+.brand svg { width: 28px; height: 28px; }
+.brand span { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: .04em; color: var(--gold); white-space: nowrap; }
+.nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { text-decoration: none; color: var(--fg2); font-size: 14px; padding: 6px 10px; border-radius: 6px; white-space: nowrap; }
+.nav a:hover, .nav a.on { color: var(--fg); background: var(--panel2); }
+.status { display: flex; align-items: center; gap: 8px; flex: none; font-size: 13px; color: var(--fg2); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 10px; cursor: default; position: relative; }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
+.status.stale .dot { background: var(--warn); box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 25%, transparent); }
+.status.old .dot { background: var(--bad); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 25%, transparent); }
+.status b { color: var(--fg); font-weight: 600; }
+.status.flash { border-color: var(--gold); background: var(--gold-soft); }
+@media (prefers-reduced-motion: no-preference) { .status { transition: background .4s, border-color .4s; } .status .dot { animation: pulse 2.4s ease-in-out infinite; } }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 0%, transparent); } }
+@media (max-width: 760px) { .top .inner { flex-wrap: wrap; gap: 6px 12px; padding-block: 8px; } .nav { order: 3; flex-basis: 100%; } .status { margin-left: auto; } }
+
+/* hero */
+.hero { padding-block: 44px 28px; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg3); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 50px); line-height: 1.08; margin: 8px 0 14px; letter-spacing: .01em; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--gold); }
+.lede { font-size: 18px; max-width: 68ch; margin: 0; color: var(--fg2); text-wrap: pretty; }
+.lede b { color: var(--fg); font-weight: 600; }
+.fresh { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; font-size: 13px; color: var(--fg3); }
+.fresh span b { color: var(--fg2); font-weight: 500; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 28px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; box-shadow: var(--shadow); display: grid; gap: 6px; text-align: left; cursor: pointer; position: relative; overflow: hidden; min-width: 0; }
+.kpi::after { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--kc, var(--gold)); }
+.kpi:hover { border-color: var(--line2); }
+.kpi:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.kpi .lab { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg3); }
+.kpi .who { display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 0; }
+.kpi .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kpi .big { font-family: var(--num); font-size: 34px; line-height: 1.05; }
+.kpi .big small { font-family: var(--ui); font-size: 14px; color: var(--fg3); margin-left: 4px; }
+.kpi .sub { font-size: 13px; color: var(--fg2); }
+
+/* sections */
+section.block { padding-block: 34px; border-top: 1px solid var(--line); }
+.shead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 24px; margin-bottom: 18px; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.shead p { margin: 4px 0 0; color: var(--fg2); max-width: 70ch; }
+.note { font-size: 13px; color: var(--fg3); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+
+/* quick views */
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chipbtn { border: 1px solid var(--line2); background: var(--panel); border-radius: 999px; padding: 6px 14px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.chipbtn:hover { border-color: var(--gold); }
+.chipbtn[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); color: var(--fg); }
+.chipbtn i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* finder */
+.finder { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 22px; align-items: start; }
+.filters { padding: 16px; display: grid; gap: 18px; position: sticky; top: 76px; }
+.filters h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg3); font-weight: 600; }
+.seg { display: grid; gap: 2px; }
+.seg button { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 6px 8px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 14px; color: var(--fg2); }
+.seg button:hover { background: var(--panel2); color: var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--gold-soft); color: var(--fg); font-weight: 600; }
+.seg button i { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.seg button .n { margin-left: auto; font-size: 12px; color: var(--fg3); font-weight: 400; }
+.row2 { display: flex; flex-wrap: wrap; gap: 4px; }
+.row2 button { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 4px 10px; font-size: 13px; cursor: pointer; color: var(--fg2); }
+.row2 button[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); color: var(--fg); }
+.sel { width: 100%; appearance: none; background-color: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 7px 30px 7px 10px; font-size: 14px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg3) 50%), linear-gradient(135deg, var(--fg3) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 55%, calc(100% - 10px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.search { width: 100%; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; font-size: 14px; }
+.sel:focus-visible, .search:focus-visible, .seg button:focus-visible, .row2 button:focus-visible, .chipbtn:focus-visible, th.s:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.toggle input { width: 16px; height: 16px; accent-color: var(--gold); }
+.reset { border: 0; background: none; color: var(--fg3); font-size: 13px; text-decoration: underline; cursor: pointer; padding: 0; justify-self: start; }
+.results { display: grid; gap: 16px; min-width: 0; }
+.summary { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.summary .count { font-size: 15px; color: var(--fg2); }
+.summary .count b { color: var(--fg); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--fg3); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 9px; height: 9px; border-radius: 2px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { fill: var(--fg3); font-size: 11px; font-family: var(--ui); }
+.chart .lbl { fill: var(--fg); font-size: 12px; }
+.chart .grid line { stroke: var(--grid); }
+.barpanel { padding: 14px 16px 8px; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line2); box-shadow: var(--shadow); border-radius: 8px; padding: 8px 11px; font-size: 13px; line-height: 1.45; max-width: 280px; z-index: 5; }
+.tip b { font-weight: 600; }
+.tip .t2 { color: var(--fg3); }
+
+/* table */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 14px; }
+th, td { padding: 9px 12px; text-align: left; white-space: nowrap; }
+th { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--fg3); text-transform: uppercase; border-bottom: 1px solid var(--line2); position: sticky; top: 0; background: var(--panel); }
+th.s { cursor: pointer; user-select: none; }
+th.s:hover { color: var(--fg); }
+th .ar { font-size: 9px; margin-left: 4px; visibility: hidden; }
+th[aria-sort="ascending"] .ar, th[aria-sort="descending"] .ar { visibility: visible; color: var(--gold); }
+th[aria-sort="ascending"] .ar::after { content: "▲"; }
+th[aria-sort="descending"] .ar::after { content: "▼"; }
+th:not([aria-sort]) .ar::after, th[aria-sort="none"] .ar::after { content: "▼"; }
+td { border-bottom: 1px solid var(--line); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--panel2); }
+td.n, th.n { text-align: right; }
+.item { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.item a { text-decoration: none; font-weight: 600; }
+.item a:hover { text-decoration: underline; }
+.ico { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line2); flex: none; background: var(--panel2); object-fit: cover; }
+.q-Common { color: var(--q-common); } .q-Uncommon { color: var(--q-uncommon); } .q-Rare { color: var(--q-rare); } .q-Epic { color: var(--q-epic); }
+.ico.q-Uncommon { border-color: var(--q-uncommon); } .ico.q-Rare { border-color: var(--q-rare); } .ico.q-Epic { border-color: var(--q-epic); }
+.tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg2); }
+.tag i { width: 8px; height: 8px; border-radius: 2px; }
+.cd { font-size: 11px; color: var(--fg3); border: 1px solid var(--line2); border-radius: 4px; padding: 0 5px; margin-left: 6px; text-transform: uppercase; letter-spacing: .05em; }
+.up { color: var(--ok); } .down { color: var(--bad); } .flat { color: var(--fg3); } .loss { color: var(--bad); }
+.coin { white-space: nowrap; }
+.coin .g, .coin .s, .coin .c { font-size: .78em; font-weight: 600; margin: 0 2px 0 1px; }
+.coin .g { color: var(--coin-g); } .coin .s { color: var(--coin-s); } .coin .c { color: var(--coin-c); }
+.more { justify-self: center; }
+
+/* watch */
+.watch { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 22px; align-items: start; }
+.picker { padding: 14px; display: grid; gap: 12px; position: sticky; top: 76px; }
+.picks { display: grid; gap: 2px; max-height: 420px; overflow: auto; }
+.picks button { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 6px 8px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 14px; }
+.picks button:hover { background: var(--panel2); }
+.picks button[aria-pressed="true"] { background: var(--gold-soft); }
+.picks button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.picks button em { font-style: normal; font-size: 12px; }
+.wdetail { display: grid; gap: 16px; min-width: 0; }
+.whead { display: flex; align-items: center; gap: 14px; }
+.whead .ico { width: 44px; height: 44px; border-radius: 7px; border-width: 2px; }
+.whead h3 { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 600; }
+.whead p { margin: 2px 0 0; color: var(--fg2); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.stat .k { font-size: 12px; color: var(--fg3); }
+.stat .v { font-family: var(--num); font-size: 21px; line-height: 1.25; }
+.stat .s { font-size: 12px; color: var(--fg3); }
+.cpanel { padding: 14px 16px 10px; }
+.cpanel h4 { margin: 0 0 6px; font-size: 13px; color: var(--fg2); font-weight: 600; }
+
+/* shopping list */
+.buy { padding: 16px 18px; display: grid; gap: 12px; }
+.buy .bh { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.buy h4 { margin: 0; font-size: 15px; font-weight: 600; color: var(--fg); }
+.qty { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg2); }
+.qty button { border: 1px solid var(--line2); background: var(--panel); color: var(--fg); border-radius: 6px; padding: 3px 9px; font: inherit; cursor: pointer; }
+.qty button[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); }
+.qty input { width: 58px; border: 1px solid var(--line2); background: var(--panel); color: var(--fg); border-radius: 6px; padding: 3px 6px; font: inherit; }
+.bwrap { overflow-x: auto; margin: 0 -4px; }
+.blist { width: 100%; min-width: 0; border-collapse: collapse; font-size: 14px; }
+@media (max-width: 560px) { .blist th:nth-child(3), .blist td:nth-child(3) { display: none; } .blist td, .blist th { padding: 6px 4px; } .blist .item span, .blist .item a { overflow-wrap: anywhere; } }
+.blist td, .blist th { padding: 7px 8px; }
+.blist th { position: static; background: none; }
+.blist tbody tr { cursor: default; }
+.blist tbody tr:hover td { background: none; }
+.blist .need { font-family: var(--num); font-size: 16px; font-weight: 600; }
+.blist .where { color: var(--fg2); font-size: 13px; white-space: normal; }
+.blist td:first-child { white-space: normal; }
+.blist .hint { display: block; color: var(--fg3); font-size: 12px; }
+.bsum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.bsum .stat .v { font-size: 19px; }
+.bnote { margin: 0; font-size: 13px; color: var(--fg2); }
+.bnote.warn { color: var(--warn); }
+.bnote.bad { color: var(--bad); }
+
+/* movers, demand, route */
+.cols4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.list { padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.list h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.lrow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; font-size: 14px; padding: 3px 4px; border-radius: 6px; cursor: pointer; }
+.lrow:hover { background: var(--panel2); }
+.lrow .item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.empty { font-size: 13px; color: var(--fg3); padding: 6px 0; }
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.trow { display: grid; grid-template-columns: minmax(0, 1fr) 46px 110px 52px; align-items: center; gap: 8px; font-size: 13px; padding: 2px 0; }
+.trow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trow .lv { color: var(--fg3); font-size: 12px; }
+.trow .bw { display: flex; align-items: center; gap: 6px; }
+.trow .bar { height: 7px; border-radius: 0 4px 4px 0; background: var(--p2); }
+.trow .tr { text-align: right; font-size: 12px; }
+.route { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0; counter-reset: step; }
+.step { padding: 18px 18px 18px 0; border-top: 3px solid var(--line2); position: relative; display: grid; gap: 6px; align-content: start; }
+.step::before { content: ""; position: absolute; top: -8px; left: 0; width: 13px; height: 13px; border-radius: 50%; background: var(--bg); border: 3px solid var(--gold); }
+.step .lvl { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--gold); }
+.step .what { font-weight: 600; }
+.step .why { color: var(--fg2); font-size: 14px; }
+.step .pool { font-size: 14px; }
+details.method { margin-top: 10px; }
+details.method summary { cursor: pointer; font-weight: 600; }
+details.method ul { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 80ch; color: var(--fg2); }
+footer { border-top: 1px solid var(--line); padding-block: 26px 40px; color: var(--fg3); font-size: 13px; }
+footer .inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 30px; }
+footer a { color: var(--fg2); }
+.sk { color: transparent !important; background: var(--panel2); border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .finder, .watch { grid-template-columns: minmax(0, 1fr); }
+  .filters, .picker { position: static; }
+  .filters { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .picks { max-height: 220px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .seg button { border: 1px solid var(--line); padding: 4px 10px; }
+  .seg button .n { margin-left: 4px; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+</head>
+<body>
+<header class="top gutter">
+  <div class="inner">
+    <a class="brand" href="#overview" aria-label="Forever Gold Paths, back to top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="var(--gold)" opacity=".18"/><circle cx="16" cy="16" r="10" fill="none" stroke="var(--gold)" stroke-width="2.5"/><path d="M16 9.5l2 4.2 4.5.5-3.4 3 1 4.4L16 19.3l-4.1 2.3 1-4.4-3.4-3 4.5-.5z" fill="var(--gold)"/></svg>
+      <span>Forever Gold Paths</span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#finder">Finder</a><a href="#watch">Price watch</a><a href="#movers">Movers</a><a href="#demand">Demand</a><a href="#speed">Profit vs speed</a><a href="#route">Route</a>
+    </nav>
+    <div class="status" id="status" title="">
+      <span class="dot" aria-hidden="true"></span><span id="status-text">Loading…</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero gutter" id="overview">
+    <div class="inner">
+      <div class="eyebrow">WoW Forever · Alliance auction house · TradeSkillMaster data</div>
+      <h1>Where the <em>gold</em> is right now</h1>
+      <p class="lede" id="lede">Loading the latest market data…</p>
+      <div class="fresh" id="fresh"></div>
+      <div class="kpis" id="kpis"></div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="finder">
+    <div class="inner">
+      <div class="shead">
+        <div><h2>Find a money path</h2><p>Every craft, gatherable, cloth drop, enchanting material, vendor resale and looted green that sells. Start from a quick view or filter on the left; click a row to open its shopping list and price history.</p></div>
+      </div>
+      <div class="presets" id="presets" role="group" aria-label="Quick views"></div>
+      <div class="finder">
+        <aside class="filters panel" aria-label="Filters">
+          <div><h3>Path</h3><div class="seg" id="f-path"></div></div>
+          <div><h3>Profession or source</h3><select class="sel" id="f-prof" aria-label="Profession or source"></select></div>
+          <div><h3>Search</h3><input class="search" id="f-q" type="search" placeholder="Item name" aria-label="Search items" autocomplete="off"></div>
+          <div><h3>Level or skill needed</h3><div class="row2" id="f-level"></div></div>
+          <div><h3>Sells at least</h3><div class="row2" id="f-sold"></div></div>
+          <div><label class="toggle"><input type="checkbox" id="f-profit" checked> Profitable only</label></div>
+          <button class="reset" id="f-reset" type="button">Reset filters</button>
+        </aside>
+        <div class="results">
+          <div class="summary"><div class="count" id="count">—</div><div class="legend" id="legend"></div></div>
+          <div class="panel barpanel"><div class="chart" id="bars"></div></div>
+          <div class="panel tablewrap">
+            <table id="table">
+              <thead><tr>
+                <th class="s" tabindex="0" data-k="item">Item<span class="ar"></span></th>
+                <th class="s" tabindex="0" data-k="path">Path<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="level">Level<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="profitEach">Profit each<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="soldPerDay">Sold / day<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="poolGold">Pool / day<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="now">Cheapest now<span class="ar"></span></th>
+                <th class="n">24h low – high</th>
+                <th class="s n" tabindex="0" data-k="change24">24h<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="change7">7 days<span class="ar"></span></th>
+                <th class="s n" tabindex="0" data-k="trend">Region trend<span class="ar"></span></th>
+              </tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <button class="chipbtn more" id="more" type="button" hidden>Show more</button>
+          <p class="note">Profit each is after the 5% AH cut and material costs. Pool / day is profit each × units sold a day across the region; your realm gets a share. Cheapest now and the 24h range come from this realm's hourly scans and your own AH visits. Region trend compares the last 14 days with the 60-day average.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="watch">
+    <div class="inner">
+      <div class="shead"><div><h2>Price watch</h2><p>The cheapest listing on this realm from TSM's hourly scans and every time it was seen at the auction house in game (the AH bar's Scan watch list button refreshes about 100 cloth, herb, potion and crafted items in a minute). This page checks for new prices every minute while it's open. Nights (00:00–07:59 US Eastern) are shaded so you can time buying and posting.</p></div></div>
+      <div class="watch">
+        <aside class="picker panel" aria-label="Pick an item">
+          <input class="search" id="w-q" type="search" placeholder="Find any item" aria-label="Find an item to watch" autocomplete="off">
+          <div class="picks" id="picks"></div>
+        </aside>
+        <div class="wdetail">
+          <div class="whead" id="whead"></div>
+          <p class="lede" id="wlead" style="font-size:16px"></p>
+          <div class="panel buy" id="wbuy" hidden></div>
+          <div class="stats" id="wstats"></div>
+          <div class="panel cpanel"><h4>Cheapest listing over time</h4><div class="chart" id="wchart"></div></div>
+          <div class="panel cpanel"><h4>Average price by hour of day</h4><div class="chart" id="hchart"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="movers">
+    <div class="inner">
+      <div class="shead"><div><h2>Movers</h2><p>Items selling 50+ a day whose cheapest listing moved most. A rise is a good moment to sell; a drop is a good moment to buy.</p></div></div>
+      <div class="cols4" id="moverlists"></div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="demand">
+    <div class="inner">
+      <div class="shead"><div><h2>Where players' needs are heading</h2><p>What players buy at each level tier shows where the population is. Bars are gold traded a day across the region; the arrow is the price trend. Rising prices mean demand is outrunning supply.</p></div></div>
+      <div class="tiers" id="tiers"></div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="speed">
+    <div class="inner">
+      <div class="shead"><div><h2>Profit against how fast it sells</h2><p>Each dot is one money path from the current filters. Up and to the right is best; both axes are log scale.</p></div></div>
+      <div class="panel cpanel"><div class="chart" id="scatter"></div></div>
+    </div>
+  </section>
+
+  <section class="block gutter" id="route">
+    <div class="inner">
+      <div class="shead"><div><h2>Tailoring and Alchemy route</h2><p>One profession at a time: the milestones where each one starts paying, with today's region profit pool.</p></div></div>
+      <div class="route" id="routesteps"></div>
+      <details class="method">
+        <summary>How these numbers are worked out</summary>
+        <ul>
+          <li>Sale price is the lowest of the region's average sale price, this realm's market value and its cheapest listing: what an item really sells for, not the highest listing.</li>
+          <li>Materials cost this realm's cheapest listing, or an Alliance vendor's price. The cheapest listing usually covers only a few units, so bulk buying costs a little more.</li>
+          <li>TSM counts ammo per shot, so 18,000 Heavy Shot a day at 2 copper each is only a few gold of trade.</li>
+          <li>Cooldown crafts (Mooncloth, Arcanite, Salt Shaker) are limited per character, so one crafter takes a fixed share of the pool however many sell.</li>
+          <li>Skill levels are what a trainer teaches the recipe at. The recipe data gets many of these wrong on Forever, so skills read off trainers in game replace it; a <b>~</b> means an estimate from the recipe's colours that hasn't been checked at a trainer yet.</li>
+          <li>Gathered items count their whole sale value, since the cost is your time. Looted gear counts what the AH pays over the vendor price.</li>
+          <li>Realm prices refresh about hourly and region sales about daily. In-game readings are added whenever the auction house was opened and the game saved its data.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="gutter">
+  <div class="inner">
+    <div id="foot-updated">—</div>
+    <div>Data: TradeSkillMaster region and realm data · item icons from Wowhead · raw files: <a href="data/paths.json">paths</a>, <a href="data/prices.json">prices</a>, <a href="data/demand.json">demand</a>, <a href="data/history.json">history</a></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  const PATHS = ['Crafting', 'Gathering', 'Cloth drops', 'Enchanting mats', 'Looted gear', 'Vendor resale'];
+  const PCOL = { Crafting: 'var(--p1)', Gathering: 'var(--p3)', 'Cloth drops': 'var(--p2)', 'Enchanting mats': 'var(--p4)', 'Looted gear': 'var(--p5)', 'Vendor resale': 'var(--p6)' };
+  const LEVELS = [[999, 'Any'], [30, '≤ 30'], [125, '≤ 125'], [175, '≤ 175'], [225, '≤ 225']];
+  const SOLDS = [[5, '5+'], [50, '50+'], [200, '200+'], [1000, '1k+']];
+  const DEFAULTS = { path: '', prof: '', q: '', level: 999, sold: 50, profitOnly: true, sort: 'poolGold', dir: -1, limit: 50 };
+  const S = Object.assign({}, DEFAULTS, { watch: null, wq: '', preset: 'best' });
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const D = {};
+  const $ = (id) => document.getElementById(id);
+  const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  // ---------- formatting
+  function coins(silver, opts) {
+    const span = h('span', 'coin');
+    if (silver == null || isNaN(silver)) { span.textContent = '—'; return span; }
+    const c = Math.round(silver * 100), neg = c < 0, a = Math.abs(c);
+    const g = Math.floor(a / 10000), s = Math.floor(a / 100) % 100, cc = a % 100;
+    const parts = g >= 100 ? [[g, 'g']] : g ? [[g, 'g'], [s, 's']] : s ? (cc ? [[s, 's'], [cc, 'c']] : [[s, 's']]) : [[cc, 'c']];
+    if (neg) span.append('-');
+    parts.forEach(([v, k], i) => { if (k === 's' && v === 0 && i > 0) return; if (i) span.append('\u2009'); span.append(v.toLocaleString()); span.append(h('span', k, k)); });
+    return span;
+  }
+  const moneyText = (silver) => { if (silver == null) return '—'; const c = Math.round(Math.abs(silver) * 100), g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cc = c % 100;
+    return (silver < 0 ? '-' : '') + (g ? (g >= 100 || !s ? `${g.toLocaleString()}g` : `${g}g ${s}s`) : s ? (cc ? `${s}s ${cc}c` : `${s}s`) : `${cc}c`); };
+  const goldText = (g) => { if (g == null) return '—'; const a = Math.abs(g); return (g < 0 ? '-' : '') + (a >= 100 ? `${Math.round(a).toLocaleString()}g` : a >= 10 ? `${a.toFixed(0)}g` : `${a.toFixed(1)}g`); };
+  const count = (n) => n >= 10000 ? `${Math.round(n / 1000)}k` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : `${Math.round(n)}`;
+  function pct(v) { if (v == null) return ['—', 'flat']; const r = Math.round(v); return [r > 0 ? `▲ ${r}%` : r < 0 ? `▼ ${-r}%` : '0%', r >= 3 ? 'up' : r <= -3 ? 'down' : 'flat']; }
+  const trendPct = (t) => (t == null ? null : (t - 1) * 100);
+  function ago(t) {
+    const m = Math.round((Date.now() / 1000 - t) / 60);
+    if (m < 1) return 'just now'; if (m < 60) return `${m} min ago`;
+    const hrs = Math.round(m / 60); if (hrs < 36) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
+    const d = Math.round(hrs / 24); return `${d} days ago`;
+  }
+  const clock = (t) => new Date(t * 1000).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const hh = (x) => `${String(x).padStart(2, '0')}:00`;
+  function icon(row, size) {
+    const img = h('img', 'ico q-' + (row.quality || 'Common')); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+    if (size) { img.width = size; img.height = size; }
+    if (row.icon) img.src = `https://wow.zamimg.com/images/wow/icons/${size > 30 ? 'large' : 'small'}/${row.icon}.jpg`;
+    img.onerror = () => { img.removeAttribute('src'); };
+    return img;
+  }
+  function itemCell(row, link) {
+    const d = h('div', 'item'); d.append(icon(row, 22));
+    const name = link && row.id ? h('a', 'q-' + (row.quality || 'Common'), row.item) : h('span', 'q-' + (row.quality || 'Common'), row.item);
+    if (link && row.id) { name.href = `https://www.wowhead.com/classic/item=${row.id}`; name.target = '_blank'; name.rel = 'noopener'; name.addEventListener('click', (e) => e.stopPropagation()); }
+    d.append(name); return d;
+  }
+  function source(x) { return x.path === 'Vendor resale' ? 'Vendors' : x.path === 'Looted gear' ? `${x.detail} gear` : x.detail; }
+  const priceOf = (item) => D.priceMap && D.priceMap.get(item);
+
+  // ---------- tooltip
+  function tip(box) {
+    let t = box.querySelector('.tip');
+    if (!t) { t = h('div', 'tip'); t.hidden = true; box.append(t); }
+    return {
+      show(nodes, x, y) { t.replaceChildren(...nodes); t.hidden = false; const bw = box.clientWidth; t.style.left = Math.max(0, Math.min(bw - t.offsetWidth, x + 14)) + 'px'; t.style.top = Math.max(0, y - t.offsetHeight - 10) + 'px'; },
+      hide() { t.hidden = true; },
+    };
+  }
+  function tipFor(x) {
+    const a = h('div'); a.append(h('b', 'q-' + (x.quality || 'Common'), x.item));
+    const b = h('div', 't2', `${x.path} · ${x.detail}${x.level ? ` · ${x.levelKind === 'skill' ? 'skill' : 'level'} ${lv(x)}` : ''}${x.cooldown ? ' · cooldown' : ''}`);
+    const c = h('div'); c.append(coins(x.profitEach), ` profit each · ${count(x.soldPerDay)} sold a day`);
+    const d = h('div'); d.append(`Pool ${goldText(x.poolGold)} a day`);
+    return [a, b, c, d];
+  }
+
+  // ---------- status / freshness
+  function renderStatus() {
+    const st = D.status; if (!st) return;
+    const age = Date.now() / 1000 - st.realmScan;
+    const el = $('status'); el.classList.toggle('stale', age > 3 * 3600 && age <= 12 * 3600); el.classList.toggle('old', age > 12 * 3600);
+    const newest = Math.max(st.realmScan, st.lastInGame || 0);
+    $('status-text').replaceChildren('Prices ', h('b', null, ago(newest)), ' · live');
+    el.title = `Checked ${new Date(st.built * 1000).toLocaleString()}\nRealm prices (TSM scan): ${new Date(st.realmScan * 1000).toLocaleString()}\nRegion sales: ${new Date(st.regionData * 1000).toLocaleString()}`;
+    const f = $('fresh');
+    const item = (k, v) => { const s = h('span'); s.append(k + ' ', h('b', null, v)); return s; };
+    f.replaceChildren(
+      item('Published', `${ago(st.built)} (${clock(st.built)})`),
+      item('Realm prices', `${ago(st.realmScan)} · hourly`),
+      item('Region sales', `${ago(st.regionData)} · daily`),
+      item('In-game readings', st.lastInGame ? ago(st.lastInGame) : 'none yet'),
+      item('Tracked scans', String(st.realmScans)));
+    $('foot-updated').textContent = `Last updated ${new Date(st.built * 1000).toLocaleString()} · realm prices from ${new Date(st.realmScan * 1000).toLocaleString()} · region sales from ${new Date(st.regionData * 1000).toLocaleDateString()}`;
+  }
+
+  // ---------- hero
+  function renderHero() {
+    const r = D.paths; if (!r) return;
+    const byPool = r.slice().sort((a, b) => b.poolGold - a.poolGold);
+    const top = byPool[0];
+    const shot = r.find((x) => x.item === 'Crafted Heavy Shot' && x.path === 'Crafting');
+    const lede = $('lede'); lede.replaceChildren();
+    lede.append('The biggest profit pool in the region is ', h('b', null, top.item), `, worth `, h('b', null, goldText(top.poolGold)), ' a day to every crafter combined.');
+    if (shot) lede.append(' For scale, Crafted Heavy Shot, the "money spammer", is worth ', h('b', null, goldText(shot.poolGold)), '.');
+    const best = (f) => r.filter(f).sort((a, b) => b.poolGold - a.poolGold)[0];
+    const cards = [
+      ['Biggest profit pool', top, 'var(--p1)'],
+      ['Best Tailoring craft', best((x) => x.path === 'Crafting' && x.detail === 'Tailoring' && !x.cooldown), 'var(--p2)'],
+      ['Best Alchemy craft', best((x) => x.path === 'Crafting' && x.detail === 'Alchemy' && !x.cooldown), 'var(--p4)'],
+      ['Best to farm at level 30 or lower', best((x) => (x.path === 'Gathering' || x.path === 'Cloth drops') && x.level <= 30), 'var(--p3)'],
+    ];
+    $('kpis').replaceChildren(...cards.filter((c) => c[1]).map(([lab, x, col]) => {
+      const b = h('button', 'kpi'); b.type = 'button'; b.style.setProperty('--kc', col);
+      b.append(h('div', 'lab', lab));
+      const who = h('div', 'who'); who.append(icon(x, 22), h('span', 'q-' + (x.quality || 'Common'), x.item)); b.append(who);
+      const big = h('div', 'big', goldText(x.poolGold)); big.append(h('small', null, 'a day')); b.append(big);
+      const sub = h('div', 'sub'); sub.append(coins(x.profitEach), ` each · ${count(x.soldPerDay)} sold a day${x.level ? ` · ${x.levelKind === 'skill' ? 'skill' : 'level'} ${lv(x)}` : ''}`); b.append(sub);
+      b.addEventListener('click', () => openWatch(x.item));
+      return b;
+    }));
+  }
+
+  // ---------- finder
+  const PRESETS = [
+    ['best', 'Best money now', {}],
+    ['tail', 'Tailoring', { path: 'Crafting', prof: 'Tailoring', level: 999, sold: 5 }],
+    ['alch', 'Alchemy', { path: 'Crafting', prof: 'Alchemy', level: 999, sold: 5 }],
+    ['farm', 'Farm at level ≤ 30', { path: '', level: 30, sold: 200 }],
+    ['cloth', 'Cloth', { path: 'Cloth drops' }],
+    ['fast', 'Fastest sellers', { sold: 1000, sort: 'soldPerDay' }],
+    ['loot', 'Greens worth listing', { path: 'Looted gear', sold: 5, sort: 'profitEach' }],
+  ];
+  function renderPresets() {
+    $('presets').replaceChildren(...PRESETS.map(([k, label, p]) => {
+      const b = h('button', 'chipbtn', label); b.type = 'button'; b.setAttribute('aria-pressed', S.preset === k ? 'true' : 'false');
+      b.addEventListener('click', () => { Object.assign(S, DEFAULTS, p, { preset: k }); $('f-q').value = ''; $('f-profit').checked = S.profitOnly; renderFinder(); });
+      return b;
+    }));
+  }
+  function filtered() {
+    const r = D.paths || [];
+    const q = S.q.trim().toLowerCase();
+    const val = (x, k) => (k === 'now' || k === 'change24' || k === 'change7') ? (priceOf(x.item) || {})[k] : x[k];
+    return r.filter((x) => (!S.path || x.path === S.path) && (!S.prof || source(x) === S.prof) && (x.level || 0) <= S.level
+        && x.soldPerDay >= S.sold && (!S.profitOnly || x.poolGold > 0) && (!q || x.item.toLowerCase().includes(q)))
+      .sort((a, b) => { const va = val(a, S.sort), vb = val(b, S.sort);
+        if (va == null && vb == null) return b.poolGold - a.poolGold; if (va == null) return 1; if (vb == null) return -1;
+        const c = typeof va === 'string' ? va.localeCompare(vb) : va - vb; return c ? c * S.dir : b.poolGold - a.poolGold; });
+  }
+  function renderFilters() {
+    const r = D.paths || [];
+    const base = r.filter((x) => (x.level || 0) <= S.level && x.soldPerDay >= S.sold && (!S.profitOnly || x.poolGold > 0));
+    const counts = d3.rollup(base, (v) => v.length, (x) => x.path);
+    $('f-path').replaceChildren(...[['', 'All paths']].concat(PATHS.map((p) => [p, p])).map(([v, label]) => {
+      const b = h('button'); b.type = 'button'; b.setAttribute('aria-pressed', S.path === v ? 'true' : 'false');
+      const i = h('i'); i.style.background = v ? PCOL[v] : 'var(--fg3)'; b.append(i, label, h('span', 'n', String(v ? counts.get(v) || 0 : base.length)));
+      b.addEventListener('click', () => { S.path = v; S.prof = ''; S.preset = null; renderFinder(); });
+      return b;
+    }));
+    const sel = $('f-prof');
+    const groups = d3.groups(r.filter((x) => !S.path || x.path === S.path), (x) => x.path).sort((a, b) => PATHS.indexOf(a[0]) - PATHS.indexOf(b[0]));
+    sel.replaceChildren(new Option(S.path ? `All ${S.path.toLowerCase()}` : 'All professions and sources', ''), ...groups.map(([g, xs]) => {
+      const og = document.createElement('optgroup'); og.label = g;
+      d3.rollups(xs, (v) => v.length, source).sort((a, b) => b[1] - a[1]).forEach(([n, c]) => og.append(new Option(`${n} (${c})`, n)));
+      return og;
+    }));
+    sel.value = S.prof;
+    const seg = (id, items, key) => $(id).replaceChildren(...items.map(([v, label]) => {
+      const b = h('button', null, label); b.type = 'button'; b.setAttribute('aria-pressed', S[key] === v ? 'true' : 'false');
+      b.addEventListener('click', () => { S[key] = v; S.preset = null; renderFinder(); }); return b;
+    }));
+    seg('f-level', LEVELS, 'level'); seg('f-sold', SOLDS, 'sold');
+    $('legend').replaceChildren(...PATHS.map((p) => { const s = h('span'); const i = h('i'); i.style.background = PCOL[p]; s.append(i, p); return s; }));
+  }
+  function renderCount(f) {
+    const c = $('count'); c.replaceChildren(h('b', null, String(f.length)), ` money path${f.length === 1 ? '' : 's'} match`);
+    if (S.prof) c.append(` in ${S.prof}`);
+    const pos = f.filter((x) => x.poolGold > 0).reduce((a, x) => a + x.poolGold, 0);
+    if (pos) c.append(` · combined pool `, h('b', null, goldText(pos)), ' a day');
+  }
+  function renderBars(f) {
+    const el = $('bars'); el.replaceChildren();
+    const k = ['profitEach', 'soldPerDay'].includes(S.sort) ? S.sort : 'poolGold';
+    const data = f.filter((d) => d.poolGold > 0 && d[k] > 0).sort((a, b) => b[k] - a[k]).slice(0, 12);
+    if (!data.length) { el.append(h('div', 'empty', 'Nothing matches these filters. Try a lower "Sells at least" or untick "Profitable only".')); return; }
+    const W = el.clientWidth || 700, rowH = 28, narrow = W < 520;
+    const fmt = k === 'soldPerDay' ? count : k === 'profitEach' ? moneyText : goldText;
+    const svg = d3.select(el).append('svg').attr('role', 'img').attr('aria-label', `Top ${data.length} money paths by ${k === 'poolGold' ? 'profit pool a day' : k === 'profitEach' ? 'profit each' : 'sales a day'}`);
+    const probe = svg.append('text').attr('class', 'lbl');
+    let left = 0; data.forEach((d) => { probe.text(d.item); left = Math.max(left, probe.node().getComputedTextLength()); }); probe.remove();
+    left = Math.min(left + 34, W * (narrow ? 0.5 : 0.36));
+    const lo = Math.max(k === 'profitEach' ? 0.01 : 0.1, d3.min(data, (d) => d[k]) * 0.6), hi = d3.max(data, (d) => d[k]) * 1.15;
+    const H = data.length * rowH + 22, x = d3.scaleLog().domain([lo, hi]).range([left, W - 56]);
+    svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const ticks = []; for (let p = Math.ceil(Math.log10(lo)); 10 ** p <= hi; p++) ticks.push(10 ** p);
+    const g = svg.append('g').attr('class', 'grid');
+    ticks.forEach((v) => { g.append('line').attr('x1', x(v)).attr('x2', x(v)).attr('y1', 0).attr('y2', H - 18); svg.append('text').attr('x', x(v)).attr('y', H - 4).attr('text-anchor', 'middle').text(fmt(v)); });
+    const t = tip(el);
+    const rows = svg.selectAll('g.r').data(data).join('g').attr('class', 'r').attr('transform', (d, i) => `translate(0,${i * rowH})`).style('cursor', 'pointer');
+    rows.append('image').attr('x', 0).attr('y', 5).attr('width', 18).attr('height', 18).attr('href', (d) => d.icon ? `https://wow.zamimg.com/images/wow/icons/small/${d.icon}.jpg` : null);
+    rows.append('text').attr('class', 'lbl').attr('x', 26).attr('y', rowH / 2 + 4).text((d) => { const lim = Math.floor((left - 34) / 6.6); return d.item.length > lim ? d.item.slice(0, lim - 1) + '…' : d.item; });
+    const bars = rows.append('rect').attr('x', left).attr('y', 7).attr('height', rowH - 14).attr('rx', 3).style('fill', (d) => PCOL[d.path]).attr('width', (d) => Math.max(2, x(d[k]) - left));
+    rows.append('text').attr('x', (d) => x(d[k]) + 6).attr('y', rowH / 2 + 4).style('fill', 'var(--fg2)').text((d) => fmt(d[k]));
+    rows.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, el); t.show(tipFor(d), mx, my); }).on('mouseleave', () => t.hide())
+      .on('click', (ev, d) => openWatch(d.item));
+    if (!reduce && !el.dataset.played) { el.dataset.played = '1'; bars.attr('width', 0).transition().duration(600).ease(d3.easeCubicOut).attr('width', (d) => Math.max(2, x(d[k]) - left)); }
+  }
+  function renderTable(f) {
+    const tb = $('tbody'); tb.replaceChildren();
+    if (!f.length) { const tr = tb.insertRow(); const td = tr.insertCell(); td.colSpan = 11; td.className = 'empty'; td.textContent = 'Nothing matches these filters.'; }
+    f.slice(0, S.limit).forEach((x) => {
+      const tr = tb.insertRow(); tr.addEventListener('click', () => openWatch(x.item));
+      const c = (node, cls) => { const td = tr.insertCell(); if (cls) td.className = cls; if (node != null) td.append(node); return td; };
+      const it = itemCell(x, true); if (x.cooldown) it.append(h('span', 'cd', 'cooldown')); c(it);
+      const tg = h('span', 'tag'); const i = h('i'); i.style.background = PCOL[x.path]; tg.append(i, source(x)); tg.title = x.path; c(tg);
+      c(x.level ? lv(x) : '—', 'n');
+      c(coins(x.profitEach), x.profitEach < 0 ? 'n loss' : 'n');
+      c(count(x.soldPerDay), 'n');
+      c(goldText(x.poolGold), x.poolGold < 0 ? 'n loss' : 'n');
+      const pr = priceOf(x.item);
+      c(pr ? coins(pr.now) : '—', 'n');
+      if (pr && pr.low24 !== pr.high24) { const s = h('span'); s.append(coins(pr.low24, { short: true }), ' – ', coins(pr.high24, { short: true })); c(s, 'n'); } else c(pr ? coins(pr.low24) : '—', 'n');
+      const [a24, k24] = pct(pr && pr.change24); c(a24, 'n ' + k24);
+      const [a7, k7] = pct(pr && pr.change7); c(a7, 'n ' + k7);
+      const [tt, kt] = pct(trendPct(x.trend)); c(tt, 'n ' + kt);
+    });
+    const more = $('more'); more.hidden = f.length <= S.limit; more.textContent = `Show ${Math.min(50, f.length - S.limit)} more of ${f.length - S.limit}`;
+    document.querySelectorAll('#table th[data-k]').forEach((th) => th.setAttribute('aria-sort', th.dataset.k === S.sort ? (S.dir > 0 ? 'ascending' : 'descending') : 'none'));
+  }
+  function renderFinder() { renderPresets(); renderFilters(); const f = filtered(); renderCount(f); renderBars(f); renderTable(f); renderScatter(f); }
+
+  // ---------- watch
+  function openWatch(item, noScroll) {
+    S.watch = item; renderWatch();
+    if (!noScroll) $('watch').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+  function watchRow(item) { return (D.paths || []).find((x) => x.item === item) || (D.prices || []).find((x) => x.item === item) || { item }; }
+  function renderPicks() {
+    const q = S.wq.trim().toLowerCase(), r = D.prices || [];
+    const liquid = new Map((D.paths || []).map((x) => [x.item, x.soldPerDay]));
+    const list = (q ? r.filter((x) => x.item.toLowerCase().includes(q)) : r.filter((x) => (liquid.get(x.item) || 0) >= 200))
+      .sort((a, b) => (liquid.get(b.item) || 0) - (liquid.get(a.item) || 0)).slice(0, 60);
+    $('picks').replaceChildren(...(list.length ? list.map((x) => {
+      const b = h('button'); b.type = 'button'; b.setAttribute('aria-pressed', S.watch === x.item ? 'true' : 'false');
+      const row = watchRow(x.item); b.append(icon(row, 18), h('span', 'q-' + (row.quality || 'Common'), x.item));
+      const [t, k] = pct(x.change24); const em = h('em', k, x.change24 == null ? moneyText(x.now) : t); b.append(em);
+      b.addEventListener('click', () => openWatch(x.item, true)); return b;
+    }) : [h('div', 'empty', 'No tracked item matches.')]));
+  }
+  function renderWatch() {
+    renderPicks();
+    const pr = priceOf(S.watch), row = watchRow(S.watch);
+    const wh = $('whead'); wh.replaceChildren();
+    renderBuy(S.watch ? row : null);
+    if (S.watch) {
+      const tt = h('div'); const h3 = h('h3', 'q-' + (row.quality || 'Common'), S.watch); tt.append(h3);
+      tt.append(h('p', null, row.path ? `${row.path} · ${row.detail}${row.level ? ` · ${row.levelKind === 'skill' ? 'skill' : 'level'} ${lv(row)}` : ''}${row.soldPerDay ? ` · ${count(row.soldPerDay)} sold a day` : ''}` : 'Demand indicator'));
+      wh.append(icon(row, 44), tt);
+    }
+    if (!pr) {
+      $('wlead').textContent = S.watch ? 'No price readings for this item yet. Scan it at the AH (/hkahlog watch) to start its price history.' : 'Pick an item to see its price history.';
+      $('wstats').replaceChildren(); $('wchart').replaceChildren(); $('hchart').replaceChildren(); return;
+    }
+    const lead = $('wlead'); lead.replaceChildren(`Cheapest right now: `, coins(pr.now), ` (${pr.nowSource === 'in game' ? 'seen in game' : 'TSM scan'}, ${clock(pr.nowAt)}). `);
+    if (pr.readings < 24) lead.append(`Tracking has ${pr.readings} reading${pr.readings === 1 ? '' : 's'} so far: the day's range and night-versus-day fill in over the first day, and the 7-day change after a week.`);
+    else {
+      if (pr.nightAvg && pr.dayAvg) { const n = Math.round((pr.nightAvg / pr.dayAvg - 1) * 100); lead.append(n === 0 ? 'Night and day prices are about the same' : `Nights run ${Math.abs(n)}% ${n < 0 ? 'cheaper' : 'dearer'} than days`); }
+      if (pr.cheapHour != null) lead.append(`; usually cheapest around ${hh(pr.cheapHour)} and dearest around ${hh(pr.dearHour)}`);
+      lead.append('.');
+    }
+    const tile = (k, v, s, cls) => { const t = h('div', 'stat'); t.append(h('div', 'k', k)); const vv = h('div', 'v' + (cls ? ' ' + cls : '')); vv.append(v); t.append(vv, h('div', 's', s || '')); return t; };
+    const range = (a, b) => { if (a == null) return '—'; if (a === b) return coins(a); const s = h('span'); s.append(coins(a, { short: true }), ' – ', coins(b, { short: true })); return s; };
+    const [a24, k24] = pct(pr.change24), [a7, k7] = pct(pr.change7);
+    const nd = h('span'); if (pr.nightAvg && pr.dayAvg) nd.append(coins(pr.nightAvg, { short: true }), ' / ', coins(pr.dayAvg, { short: true })); else nd.append('—');
+    $('wstats').replaceChildren(
+      tile('Cheapest now', coins(pr.now), `${pr.nowSource === 'in game' ? 'seen in game' : 'TSM scan'} · ${clock(pr.nowAt)}`),
+      tile('Today', range(pr.todayLow, pr.todayHigh), 'low – high since midnight'),
+      tile('Last 7 days', range(pr.low7, pr.high7), 'low – high'),
+      tile('Night / day', nd, 'average, night 00:00–07:59'),
+      tile('24 hours', a24, 'vs a day ago', k24),
+      tile('7 days', a7, 'vs a week ago', k7),
+      tile('Seen in game', pr.lastGame ? coins(pr.lastGame.price) : '—', pr.lastGame ? `${clock(pr.lastGame.t)} · ${pr.lastGame.qty} up` : 'open it at the AH to record'));
+    renderWatchChart(); renderHourChart();
+  }
+  // ---------- shopping list: what to buy to make the profit shown
+  const VENDOR_TOO = /\b(thread|vial|dye|flux|salt|spice|flask)\b/i;
+  const suggested = (x) => x.cooldown ? 1 : Math.max(1, Math.min(20, Math.round((x.soldPerDay || 0) * 0.05 / (x.makes || 1))));
+  function renderBuy(x) {
+    const box = $('wbuy'); box.replaceChildren();
+    if (!x || !x.path) { box.hidden = true; return; }
+    box.hidden = false;
+    if (!x.buy || !x.buy.length) {
+      box.append(h('h4', null, 'Shopping list'), h('p', 'bnote', x.path === 'Looted gear' ? 'Nothing to buy: this drops from mobs. Loot it and post it.'
+        : `Nothing to buy: you ${x.path === 'Cloth drops' ? 'loot this from humanoids' : x.path === 'Enchanting mats' ? 'get this by disenchanting greens' : 'gather this'} and sell it, so the whole sale price is profit.`));
+      return;
+    }
+    if (!S.qty || S.qtyFor !== x.item) { S.qty = suggested(x); S.qtyFor = x.item; }
+    const n = S.qty, verb = x.path === 'Vendor resale' ? 'Buy' : 'Craft';
+    const head = h('div', 'bh'); head.append(h('h4', null, `Shopping list · ${verb.toLowerCase()} ${n}`));
+    const q = h('div', 'qty'); q.append(`${verb}s:`);
+    const sug = suggested(x);
+    [...new Set([1, 5, 10, 20, sug])].sort((a, b) => a - b).forEach((v) => {
+      const b = h('button', null, String(v)); b.type = 'button'; b.setAttribute('aria-pressed', v === n ? 'true' : 'false');
+      if (v === sug) b.title = 'Suggested: about 1 in 20 of the region\'s daily sales';
+      b.addEventListener('click', () => { S.qty = v; renderBuy(x); }); q.append(b);
+    });
+    const inp = h('input'); inp.type = 'number'; inp.min = 1; inp.max = 999; inp.value = n; inp.setAttribute('aria-label', 'How many');
+    inp.addEventListener('change', () => { const v = Math.max(1, Math.min(999, Math.round(+inp.value || 1))); S.qty = v; renderBuy(x); });
+    q.append(inp); head.append(q); box.append(head);
+
+    const t = h('table', 'blist'); const th = t.createTHead().insertRow();
+    [['Buy', ''], ['Need', 'n'], ['Price each', 'n'], ['Where', ''], ['Total', 'n']].forEach(([k, c]) => { const e = h('th', c, k); th.append(e); });
+    const tb = t.createTBody(); let spend = 0;
+    x.buy.forEach((m) => {
+      const need = m.amount * n, tot = m.price * need; spend += tot;
+      const r = tb.insertRow();
+      r.insertCell().append(itemCell(m, true));
+      const c1 = r.insertCell(); c1.className = 'n need'; c1.textContent = need.toLocaleString();
+      const c2 = r.insertCell(); c2.className = 'n'; c2.append(coins(m.price));
+      const c3 = r.insertCell(); c3.className = 'where';
+      c3.append(m.src === 'vendor' ? `Vendor: ${m.vendor || 'merchant'}` : m.src === 'ah' ? `Auction house · ${m.listed || 0} listing${m.listed === 1 ? '' : 's'}` : 'None listed now (market value)');
+      if (m.src !== 'vendor' && VENDOR_TOO.test(m.item)) c3.append(h('span', 'hint', 'Trade supply vendors sell this too: check them first'));
+      if (m.src === 'ah' && m.listed != null && m.listed < 3) c3.append(h('span', 'hint', 'Thin supply: the price may jump once these sell'));
+      const c4 = r.insertCell(); c4.className = 'n'; c4.append(coins(tot));
+    });
+    const wrap = h('div', 'bwrap'); wrap.append(t); box.append(wrap);
+
+    const made = (x.makes || 1) * n, earn = (x.sellEach || 0) * 0.95 * made, profit = earn - spend;
+    const tile = (k, v, s, cls) => { const e = h('div', 'stat'); e.append(h('div', 'k', k)); const vv = h('div', 'v' + (cls ? ' ' + cls : '')); vv.append(v); e.append(vv, h('div', 's', s || '')); return e; };
+    const sum = h('div', 'bsum');
+    sum.append(
+      tile('You spend', coins(spend), `on ${x.buy.length} material${x.buy.length === 1 ? '' : 's'}`),
+      tile(x.path === 'Vendor resale' ? 'You post' : 'You make', `${made % 1 ? made.toFixed(1) : made.toLocaleString()} × ${x.item}`, x.makes > 1 ? `${x.makes} per craft on average` : ''),
+      tile('You sell for', coins(earn), `at ${moneyText(x.sellEach)} each, after the 5% AH cut`),
+      tile('Profit', coins(profit), spend ? `${Math.round(profit / spend * 100)}% on what you spend` : '', profit < 0 ? 'loss' : 'up'));
+    box.append(sum);
+    if (profit < 0) box.append(h('p', 'bnote bad', 'This loses money at today\'s prices. Wait for the materials to get cheaper or the sale price to rise.'));
+    if (x.cooldown) box.append(h('p', 'bnote warn', 'This craft has a cooldown, so you can only make a few at a time.'));
+    if (made > (x.soldPerDay || 0) * 0.2) box.append(h('p', 'bnote warn', `That's a lot for the market: the whole region sells about ${count(x.soldPerDay || 0)} a day, so expect to post over several days.`));
+    box.append(h('p', 'bnote', 'Prices are this realm\'s cheapest listings from the last scan; buy in stages, since the price rises as you clear the cheap ones.'));
+  }
+
+  function renderWatchChart() {
+    const el = $('wchart'); el.replaceChildren();
+    const ser = D.series && D.series[S.watch];
+    if (!ser || !ser.length) { el.append(h('div', 'empty', 'No readings yet.')); return; }
+    const pts = ser.map(([m, p, n, src]) => ({ t: new Date(m * 60000), p: p / 100, n, game: src === 1 }));
+    const W = el.clientWidth || 700, H = 260, mg = { l: 58, r: 18, t: 26, b: 28 };
+    let ext = d3.extent(pts, (p) => p.t);
+    if (+ext[1] - +ext[0] < 12 * 3600e3) ext = [new Date(+ext[1] - 24 * 3600e3), new Date(+ext[1] + 3600e3)];
+    const x = d3.scaleTime().domain(ext).range([mg.l, W - mg.r]);
+    const lo = d3.min(pts, (p) => p.p), hi = d3.max(pts, (p) => p.p), pad = Math.max((hi - lo) * 0.25, hi * 0.06);
+    const y = d3.scaleLinear().domain([Math.max(0, lo - pad), hi + pad]).nice(4).range([H - mg.b, mg.t]);
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img').attr('aria-label', `Cheapest listing of ${S.watch} over time; night hours shaded`);
+    for (let d0 = d3.timeDay.floor(ext[0]); d0 < ext[1]; d0 = d3.timeDay.offset(d0, 1)) {
+      const a = Math.max(x(d0), mg.l), b = Math.min(x(d3.timeHour.offset(d0, 8)), W - mg.r);
+      if (b > a) svg.append('rect').attr('x', a).attr('y', mg.t).attr('width', b - a).attr('height', H - mg.b - mg.t).style('fill', 'var(--grid)').style('opacity', 0.8);
+    }
+    const g = svg.append('g').attr('class', 'grid');
+    y.ticks(4).forEach((v) => { g.append('line').attr('x1', mg.l).attr('x2', W - mg.r).attr('y1', y(v)).attr('y2', y(v)); svg.append('text').attr('x', mg.l - 8).attr('y', y(v) + 4).attr('text-anchor', 'end').text(moneyText(v)); });
+    const days = (+ext[1] - +ext[0]) / 864e5;
+    x.ticks(days > 2 ? d3.timeDay.every(1) : d3.timeHour.every(W < 500 ? 6 : 3)).forEach((v) => svg.append('text').attr('x', x(v)).attr('y', H - 8).attr('text-anchor', 'middle').text(days > 2 ? d3.timeFormat('%a %-d')(v) : d3.timeFormat('%H:%M')(v)));
+    const area = d3.area().x((p) => x(p.t)).y0(H - mg.b).y1((p) => y(p.p));
+    svg.append('path').datum(pts).attr('d', area).style('fill', 'var(--p1)').style('opacity', 0.1);
+    svg.append('path').datum(pts).attr('d', d3.line().x((p) => x(p.t)).y((p) => y(p.p))).style('fill', 'none').style('stroke', 'var(--p1)').style('stroke-width', 2).style('stroke-linejoin', 'round');
+    const minP = pts.reduce((a, b) => (b.p < a.p ? b : a)), maxP = pts.reduce((a, b) => (b.p > a.p ? b : a)), last = pts[pts.length - 1];
+    const dots = pts.filter((p) => p.game || pts.length <= 60 || p === minP || p === maxP || p === last);
+    svg.selectAll('circle').data(dots).join('circle').attr('cx', (p) => x(p.t)).attr('cy', (p) => y(p.p)).attr('r', (p) => (p === last ? 5 : p.game ? 4 : 3))
+      .style('fill', (p) => (p.game ? 'var(--p2)' : 'var(--p1)')).style('stroke', 'var(--panel)').style('stroke-width', 2);
+    const lab = (p, txt, dy) => svg.append('text').attr('class', 'lbl').attr('x', x(p.t)).attr('y', y(p.p) + dy).attr('text-anchor', x(p.t) > W - 90 ? 'end' : x(p.t) < mg.l + 60 ? 'start' : 'middle').text(txt);
+    if (minP.p !== maxP.p) { lab(maxP, `high ${moneyText(maxP.p)}`, -11); lab(minP, `low ${moneyText(minP.p)}`, 19); } else lab(last, moneyText(last.p), -11);
+    const lg = svg.append('g').attr('transform', `translate(${W - mg.r},10)`);
+    [['Seen in game', 'var(--p2)'], ['TSM hourly scan', 'var(--p1)']].forEach(([tx, c], i) => {
+      const gx = lg.append('g').attr('transform', `translate(${-i * 120},0)`);
+      gx.append('circle').attr('cx', -100).attr('cy', 0).attr('r', 4).style('fill', c); gx.append('text').attr('x', -92).attr('y', 4).text(tx);
+    });
+    const t = tip(el);
+    svg.append('rect').attr('x', mg.l).attr('y', mg.t).attr('width', W - mg.l - mg.r).attr('height', H - mg.b - mg.t).style('fill', 'transparent')
+      .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, el); const tt = x.invert(mx); const p = pts.reduce((a, b) => (Math.abs(b.t - tt) < Math.abs(a.t - tt) ? b : a));
+        const a = h('div'); a.append(coins(p.p)); t.show([a, h('div', 't2', `${d3.timeFormat('%a %b %-d, %H:%M')(p.t)} · ${p.n} listed · ${p.game ? 'seen in game' : 'TSM scan'}`)], mx, my); })
+      .on('mouseleave', () => t.hide());
+  }
+  function renderHourChart() {
+    const el = $('hchart'); el.replaceChildren();
+    const pr = priceOf(S.watch); if (!pr) return;
+    const have = pr.hourProfile.map((v, i) => ({ h: i, v })).filter((v) => v.v != null);
+    const W = el.clientWidth || 700, H = 140, mg = { l: 40, r: 8, t: 10, b: 22 };
+    const x = d3.scaleBand().domain(d3.range(24)).range([mg.l, W - mg.r]).padding(0.2);
+    const e = d3.extent(have, (v) => v.v); const y = d3.scaleLinear().domain([Math.min(0.95, e[0] || 1), Math.max(1.05, e[1] || 1)]).range([H - mg.b, mg.t]);
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img').attr('aria-label', 'Average cheapest price by hour of day compared with the overall average; night hours in blue');
+    d3.range(24).forEach((i) => svg.append('rect').attr('x', x(i)).attr('width', x.bandwidth()).attr('y', mg.t).attr('height', H - mg.b - mg.t).attr('rx', 2).style('fill', 'var(--grid)').style('opacity', 0.45));
+    svg.append('line').attr('x1', mg.l).attr('x2', W - mg.r).attr('y1', y(1)).attr('y2', y(1)).style('stroke', 'var(--axis)');
+    svg.append('text').attr('x', mg.l - 6).attr('y', y(1) + 4).attr('text-anchor', 'end').text('avg');
+    svg.selectAll('rect.b').data(have).join('rect').attr('class', 'b').attr('x', (v) => x(v.h)).attr('width', x.bandwidth()).attr('rx', 2)
+      .attr('y', (v) => Math.min(y(v.v), y(1))).attr('height', (v) => Math.max(2, Math.abs(y(v.v) - y(1)))).style('fill', (v) => (v.h < 8 ? 'var(--p2)' : 'var(--p1)'));
+    [0, 6, 12, 18].forEach((i) => svg.append('text').attr('x', x(i) + x.bandwidth() / 2).attr('y', H - 6).attr('text-anchor', 'middle').text(hh(i)));
+    if (have.length < 12) svg.append('text').attr('class', 'lbl').attr('x', (mg.l + W) / 2).attr('y', mg.t + 26).attr('text-anchor', 'middle').text(`${have.length} of 24 hours seen so far`);
+    const t = tip(el);
+    svg.selectAll('rect.hit').data(have).join('rect').attr('class', 'hit').attr('x', (v) => x(v.h)).attr('width', x.bandwidth()).attr('y', mg.t).attr('height', H - mg.b - mg.t).style('fill', 'transparent')
+      .on('mousemove', (ev, v) => { const [mx, my] = d3.pointer(ev, el); const r = Math.round((v.v - 1) * 100); t.show([h('b', null, `${hh(v.h)}–${hh((v.h + 1) % 24)}`), h('div', 't2', r === 0 ? 'about average' : `${Math.abs(r)}% ${r < 0 ? 'below' : 'above'} average`)], mx, my); })
+      .on('mouseleave', () => t.hide());
+  }
+
+  // ---------- movers
+  function renderMovers() {
+    const r = D.paths || [], p = D.prices || [];
+    const liquid = new Set(r.filter((x) => x.soldPerDay >= 50).map((x) => x.item));
+    const list = (title, key, dir, cls) => {
+      const box = h('div', 'panel list'); const t = h('h3'); t.append(h('span', cls, dir > 0 ? '▲' : '▼'), title); box.append(t);
+      const items = p.filter((x) => liquid.has(x.item) && x[key] != null && (dir > 0 ? x[key] > 0 : x[key] < 0)).sort((a, b) => dir * (b[key] - a[key])).slice(0, 7);
+      if (!items.length) box.append(h('div', 'empty', key === 'change24' ? 'Appears after a day of hourly readings.' : 'Appears after a week of readings.'));
+      items.forEach((x) => { const row = h('div', 'lrow'); row.tabIndex = 0; row.addEventListener('click', () => openWatch(x.item));
+        row.addEventListener('keydown', (e) => { if (e.key === 'Enter') openWatch(x.item); });
+        const [txt, k] = pct(x[key]); row.append(itemCell(watchRow(x.item)), coins(x.now), h('span', k, txt)); box.append(row); });
+      return box;
+    };
+    $('moverlists').replaceChildren(list('Rising, 24h', 'change24', 1, 'up'), list('Falling, 24h', 'change24', -1, 'down'), list('Rising, 7 days', 'change7', 1, 'up'), list('Falling, 7 days', 'change7', -1, 'down'));
+  }
+
+  // ---------- demand
+  function renderDemand() {
+    const all = D.demand || [];
+    $('tiers').replaceChildren(...d3.groups(all, (r) => r.group).map(([name, items]) => {
+      const box = h('div', 'panel list'); box.append(h('h3', null, name));
+      const max = d3.max(items, (r) => r.goldPerDay) || 1;
+      items.sort((a, b) => a.reqLevel - b.reqLevel).forEach((r) => {
+        const row = h('div', 'trow'); row.style.cursor = 'pointer'; row.addEventListener('click', () => openWatch(r.item));
+        const nm = h('span', 'nm'); nm.append(itemCell(r)); row.append(nm, h('span', 'lv', r.reqLevel ? `lvl ${r.reqLevel}` : ''));
+        const bw = h('span', 'bw'); const bar = h('span', 'bar'); bar.style.width = Math.max(2, (r.goldPerDay / max) * 60) + 'px'; bw.append(bar, goldText(r.goldPerDay)); row.append(bw);
+        const [t, k] = pct(trendPct(r.trend)); row.append(h('span', 'tr ' + k, t)); box.append(row);
+      });
+      return box;
+    }));
+  }
+
+  // ---------- scatter
+  function renderScatter(f) {
+    const el = $('scatter'); el.replaceChildren();
+    const data = f.filter((d) => d.profitEach > 0 && d.soldPerDay > 0);
+    if (!data.length) { el.append(h('div', 'empty', 'Nothing to plot with these filters.')); return; }
+    const W = el.clientWidth || 700, H = Math.max(280, Math.min(460, W * 0.55)), mg = { l: 56, r: 18, t: 18, b: 36 };
+    const x = d3.scaleLog().domain([d3.min(data, (d) => d.soldPerDay) * 0.7, d3.max(data, (d) => d.soldPerDay) * 1.4]).range([mg.l, W - mg.r]);
+    const y = d3.scaleLog().domain([d3.min(data, (d) => d.profitEach) * 0.7, d3.max(data, (d) => d.profitEach) * 1.5]).range([H - mg.b, mg.t]);
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img').attr('aria-label', 'Profit each against sales a day for the filtered money paths, log scales');
+    const g = svg.append('g').attr('class', 'grid');
+    const lt = (lo, hi) => { const t = []; for (let p = Math.ceil(Math.log10(lo)); 10 ** p <= hi; p++) t.push(10 ** p); return t; };
+    lt(...x.domain()).forEach((v) => { g.append('line').attr('x1', x(v)).attr('x2', x(v)).attr('y1', mg.t).attr('y2', H - mg.b); svg.append('text').attr('x', x(v)).attr('y', H - mg.b + 16).attr('text-anchor', 'middle').text(count(v)); });
+    lt(...y.domain()).forEach((v) => { g.append('line').attr('x1', mg.l).attr('x2', W - mg.r).attr('y1', y(v)).attr('y2', y(v)); svg.append('text').attr('x', mg.l - 8).attr('y', y(v) + 4).attr('text-anchor', 'end').text(moneyText(v)); });
+    svg.append('text').attr('x', W - mg.r).attr('y', H - 4).attr('text-anchor', 'end').text('sold a day →');
+    svg.append('text').attr('x', mg.l).attr('y', mg.t - 6).text('↑ profit each');
+    const t = tip(el);
+    svg.selectAll('circle').data(data).join('circle').attr('cx', (d) => x(d.soldPerDay)).attr('cy', (d) => y(d.profitEach))
+      .attr('r', (d) => Math.max(4, Math.min(11, 3 + Math.sqrt(Math.max(d.poolGold, 0)) / 2))).style('fill', (d) => PCOL[d.path]).style('opacity', 0.85).style('stroke', 'var(--panel)').style('stroke-width', 1.5).style('cursor', 'pointer')
+      .on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, el); t.show(tipFor(d), mx, my); }).on('mouseleave', () => t.hide()).on('click', (ev, d) => openWatch(d.item));
+    const placed = [];
+    data.slice().sort((a, b) => b.poolGold - a.poolGold).slice(0, 10).forEach((d) => {
+      if (placed.length >= 5) return;
+      const right = x(d.soldPerDay) > W * 0.7;
+      const tx = svg.append('text').attr('class', 'lbl').attr('x', x(d.soldPerDay) + (right ? -12 : 12)).attr('y', y(d.profitEach) + 4).attr('text-anchor', right ? 'end' : 'start').text(d.item);
+      const b = tx.node().getBBox();
+      const hit = b.x < mg.l || b.x + b.width > W || b.y < mg.t || b.y + b.height > H - mg.b || placed.some((p) => b.x < p.x + p.width + 4 && p.x < b.x + b.width + 4 && b.y < p.y + p.height + 2 && p.y < b.y + b.height + 2);
+      if (hit) tx.remove(); else placed.push(b);
+    });
+  }
+
+  // a skill the recipe data lists wrong and nobody has read off a trainer yet: shown as ~N
+  function lv(x) { return (x.levelHow === 'estimate' ? '~' : '') + x.level; }
+
+  // ---------- route
+  function renderRoute() {
+    const find = (item) => (D.paths || []).filter((x) => x.item === item && x.path === 'Crafting').sort((a, b) => b.poolGold - a.poolGold)[0];
+    // the skill each milestone is taught at, from the same learn-skill data as the finder
+    const at = (prof, item, fallback) => { const x = find(item); return `${prof} ${x && x.level ? lv(x) : fallback}`; };
+    const steps = [
+      [at('Tailoring', 'Bolt of Silk Cloth', 125), 'Bolt of Silk Cloth', 'Profitable whenever Silk Cloth is cheap; a huge, steady market.', 'Bolt of Silk Cloth'],
+      [at('Tailoring', 'Bolt of Mageweave', 140), 'Bolt of Mageweave', 'Fast seller for players in their 30s and 40s.', 'Bolt of Mageweave'],
+      [at('Tailoring', 'Mooncloth', 250), 'Mooncloth and Runecloth bolts', 'Mooncloth is a cooldown craft with one of the biggest pools.', 'Mooncloth'],
+      [at('Alchemy', 'Transmute: Iron to Gold', 225), 'Transmute: Iron to Gold', 'Very liquid, steady margin.', 'Transmute: Iron to Gold'],
+      [at('Alchemy', 'Arcanite Bar', 275) + '+', 'Arcanite, essences, Major Mana', 'The biggest pools in the game.', 'Arcanite Bar'],
+    ];
+    $('routesteps').replaceChildren(...steps.map(([lvl, what, why, item]) => {
+      const s = h('div', 'step'); s.append(h('div', 'lvl', lvl), h('div', 'what', what), h('div', 'why', why));
+      const x = find(item); if (x) { const p = h('div', 'pool'); p.append(`${x.item}: `, h('b', x.poolGold < 0 ? 'loss' : null, goldText(x.poolGold)), ' a day, ', coins(x.profitEach), ' each'); s.append(p); s.style.cursor = 'pointer'; s.addEventListener('click', () => openWatch(x.item)); }
+      return s;
+    }));
+  }
+
+  // ---------- events
+  $('f-prof').addEventListener('change', (e) => { S.prof = e.target.value; S.preset = null; if (S.prof && S.level !== 999 && (D.paths || []).some((x) => source(x) === S.prof && x.path === 'Crafting')) S.level = 999; renderFinder(); });
+  let qt; $('f-q').addEventListener('input', (e) => { clearTimeout(qt); qt = setTimeout(() => { S.q = e.target.value; S.preset = null; renderFinder(); }, 120); });
+  $('f-profit').addEventListener('change', (e) => { S.profitOnly = e.target.checked; S.preset = null; renderFinder(); });
+  $('f-reset').addEventListener('click', () => { Object.assign(S, DEFAULTS, { preset: 'best' }); $('f-q').value = ''; $('f-profit').checked = true; renderFinder(); });
+  $('more').addEventListener('click', () => { S.limit += 50; renderTable(filtered()); });
+  document.querySelectorAll('#table th[data-k]').forEach((th) => {
+    const go = () => { const k = th.dataset.k; if (S.sort === k) S.dir = -S.dir; else { S.sort = k; S.dir = k === 'item' || k === 'path' ? 1 : -1; } S.preset = null; renderFinder(); };
+    th.addEventListener('click', go); th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  let wqt; $('w-q').addEventListener('input', (e) => { clearTimeout(wqt); wqt = setTimeout(() => { S.wq = e.target.value; renderPicks(); }, 120); });
+  // highlight the section in view
+  const links = [...document.querySelectorAll('.nav a')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('main section[id]').forEach((s) => io.observe(s));
+  }
+  let rw = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === rw) return; rw = innerWidth; clearTimeout(rt); rt = setTimeout(() => { renderFinder(); renderWatch(); }, 150); });
+
+  // ---------- load
+  const get = (n) => fetch(`data/${n}.json?v=${Date.now()}`, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error(n); return r.json(); });
+  function load(first) {
+    return Promise.all(['status', 'paths', 'prices', 'demand'].map((n) => get(n).catch(() => null))).then(([st, paths, prices, demand]) => {
+      if (!paths) { if (first) $('lede').textContent = 'The market data failed to load. Try reloading the page.'; return; }
+      D.status = st; D.paths = paths.rows; D.prices = prices ? prices.rows : []; D.series = prices ? prices.series : {}; D.demand = demand ? demand.rows : [];
+      D.priceMap = new Map(D.prices.map((x) => [x.item, x]));
+      const names = new Set(D.prices.map((x) => x.item));
+      if (!S.watch || !names.has(S.watch)) S.watch = ['Bolt of Silk Cloth', 'Silk Cloth', 'Wool Cloth'].find((n) => names.has(n)) || D.prices[0] && D.prices[0].item;
+      renderStatus(); renderHero(); renderFinder(); renderWatch(); renderMovers(); renderDemand(); renderRoute();
+      if (!first) { const el = $('status'); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 2500); }
+    });
+  }
+  // while the page is open, look for newly published data every minute and redraw in place
+  function poll() {
+    if (document.hidden) return;
+    get('status').then((st) => { if (st && (!D.status || st.built !== D.status.built)) load(false); else renderStatus(); }).catch(() => {});
+  }
+  load(true).then(() => {
+    const hash = decodeURIComponent(location.hash.slice(1));
+    if (hash && document.getElementById(hash)) document.getElementById(hash).scrollIntoView();
+    setInterval(poll, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  });
+})();
+</script>
+</body>
+</html>
